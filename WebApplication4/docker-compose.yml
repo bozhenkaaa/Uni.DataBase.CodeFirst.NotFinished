@@ -1,0 +1,33 @@
+version: '3.4'
+services:
+  webapplication4:
+    image: ${DOCKER_REGISTRY-}webapplication4
+    build:
+      context: .
+      dockerfile: WebApplication4/Dockerfile
+    depends_on:
+      - sqlserverService
+    networks:
+      - weathernet
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "80"
+      - "443"
+  sqlserverService:
+    image: mcr.microsoft.com/azure-sql-edge
+    hostname: localhost
+    container_name: sql
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: reallyStrongPwd123
+    volumes:
+      - ./data/mssql:/var/opt/mssql3
+    ports:
+      - 1433:1433
+    networks:
+      - weathernet
+networks:
+  weathernet:
+    driver: bridge
